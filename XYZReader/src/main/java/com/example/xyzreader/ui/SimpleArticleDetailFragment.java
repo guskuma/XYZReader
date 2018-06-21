@@ -131,7 +131,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
             return;
         }
 
-//        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
@@ -143,7 +142,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
 
             mArticleTitle = mCursor.getString(ArticleLoader.Query.TITLE);
             mImageUrl = mCursor.getString(ArticleLoader.Query.PHOTO_URL);
-//            titleView.setText(mArticleTitle);
 
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
@@ -170,7 +168,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
 
         } else {
             mRootView.setVisibility(View.GONE);
-//            titleView.setText("N/A");
             bylineView.setText("N/A" );
             bodyView.setText("N/A");
         }
