@@ -35,7 +35,6 @@
 
         <activity
             android:name=".ui.SimpleArticleDetailActivity"
-            android:label="Testando Activity"
             android:parentActivityName=".ui.ArticleListActivity"
             android:theme="@style/Theme.Bacon">
             <intent-filter>

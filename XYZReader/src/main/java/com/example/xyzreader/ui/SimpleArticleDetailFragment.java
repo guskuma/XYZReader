@@ -3,12 +3,16 @@ package com.example.xyzreader.ui;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.graphics.Palette;
 import android.text.Html;
 import android.text.format.DateUtils;
@@ -101,17 +105,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_simple_article_detail, container, false);
-
-//        mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-//                        .setType("text/plain")
-//                        .setText("Some sample text")
-//                        .getIntent(), getString(R.string.action_share)));
-//            }
-//        });
-
         return mRootView;
     }
 
@@ -136,9 +129,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
-            mRootView.setAlpha(0);
-            mRootView.setVisibility(View.VISIBLE);
-            mRootView.animate().alpha(1);
 
             mArticleTitle = mCursor.getString(ArticleLoader.Query.TITLE);
             mImageUrl = mCursor.getString(ArticleLoader.Query.PHOTO_URL);
@@ -164,6 +154,16 @@ public class SimpleArticleDetailFragment extends Fragment implements
             }
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
 
+            getActivity().findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+                            .setType("text/plain")
+                            .setText(mCursor.getString(ArticleLoader.Query.BODY))
+                            .getIntent(), getString(R.string.action_share)));
+                }
+            });
+
             mBinded = true;
 
         } else {
@@ -176,20 +176,23 @@ public class SimpleArticleDetailFragment extends Fragment implements
     public void changeContainer() {
 
         if(mBinded) {
-
-            mListener.getCollapsingToolbarLayout().setTitle(mArticleTitle);
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mImageUrl, new ImageLoader.ImageListener() {
                         @Override
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
+                            mListener.getCollapsingToolbarLayout().setTitle(mArticleTitle);
                             Bitmap bitmap = imageContainer.getBitmap();
                             if (bitmap != null) {
                                 Palette p = Palette.generate(bitmap, 12);
                                 int mutedColor = p.getDarkMutedColor(0xFF333333);
-                                mListener.getArticlePhoto().setImageBitmap(imageContainer.getBitmap());
-                                mRootView.findViewById(R.id.meta_bar)
-                                        .setBackgroundColor(mutedColor);
+                                ((ImageView) getActivity().findViewById(R.id.photo)).setImageBitmap(imageContainer.getBitmap());
+                                getActivity().findViewById(R.id.photo).animate().alpha(1f).setDuration(300);
+                                mRootView.findViewById(R.id.meta_bar).setBackgroundColor(mutedColor);
                                 mListener.getCollapsingToolbarLayout().setContentScrimColor(mutedColor);
+                                getActivity().findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
+                                getActivity().findViewById(R.id.scrim_white).animate().alpha(0f).setDuration(300).start();
+                                getActivity().findViewById(R.id.fab).setBackgroundTintList(ColorStateList.valueOf(p.getLightMutedColor(getResources().getColor(R.color.theme_primary))));
+                                ((FloatingActionButton)getActivity().findViewById(R.id.fab)).setColorFilter(mutedColor);
                             }
                         }
 
@@ -223,6 +226,11 @@ public class SimpleArticleDetailFragment extends Fragment implements
         }
 
         bindViews();
+
+        getActivity().findViewById(R.id.app_bar).animate().alpha(1f).setDuration(300);
+        getActivity().findViewById(R.id.pager).animate().alpha(1f).setDuration(300);
+        getActivity().findViewById(R.id.fab).animate().alpha(1f).setDuration(300);
+        getActivity().findViewById(R.id.progress_bar).setVisibility(View.GONE);
     }
 
     @Override

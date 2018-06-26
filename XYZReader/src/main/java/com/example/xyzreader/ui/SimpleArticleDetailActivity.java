@@ -26,13 +26,15 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
     private long mStartId;
+    private int currentPage;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_article_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(" ");
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -56,11 +58,18 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
             public void onPageSelected(int position) {
+
+                if(position != currentPage){
+                    getCollapsingToolbarLayout().setTitle(" ");
+                    findViewById(R.id.scrim_white).animate().alpha(0.2f).setDuration(300).start();
+                    findViewById(R.id.top_progress_bar).setVisibility(View.VISIBLE);
+                    currentPage = position;
+                }
+
                 if (mCursor != null) {
                     mCursor.moveToPosition(position);
                 }
@@ -68,7 +77,6 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
         });
 
@@ -78,6 +86,7 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
             }
         }
     }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
