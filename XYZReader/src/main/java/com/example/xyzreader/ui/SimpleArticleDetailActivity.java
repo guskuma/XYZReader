@@ -14,15 +14,15 @@ import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 
-public class SimpleArticleDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SimpleArticleDetailFragment.OnFragmentInteractionListener {
+public class SimpleArticleDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Cursor mCursor;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
     private long mStartId;
@@ -49,6 +49,8 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
 
         getLoaderManager().initLoader(0, null, this);
 
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.toolbar_layout);
+
         mPagerAdapter = new MyPagerAdapter(getFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
@@ -64,7 +66,7 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
             public void onPageSelected(int position) {
 
                 if(position != currentPage){
-                    getCollapsingToolbarLayout().setTitle(" ");
+                    mCollapsingToolbarLayout.setTitle(" ");
                     findViewById(R.id.scrim_white).animate().alpha(0.2f).setDuration(300).start();
                     findViewById(R.id.top_progress_bar).setVisibility(View.VISIBLE);
                     currentPage = position;
@@ -117,16 +119,6 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursor = null;
         mPagerAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public ImageView getArticlePhoto() {
-        return (ImageView) findViewById(R.id.photo);
-    }
-
-    @Override
-    public CollapsingToolbarLayout getCollapsingToolbarLayout() {
-        return (CollapsingToolbarLayout)findViewById(R.id.toolbar_layout);
     }
 
     private class MyPagerAdapter extends android.support.v13.app.FragmentStatePagerAdapter {

@@ -22,9 +22,7 @@
         <item name="colorPrimary">@color/theme_primary</item>
     </style>
 
-    <style name="Theme.Bacon.Detail">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
+    <style name="Theme.Bacon.Detail" parent="Theme.Bacon" />
 
     <style name="Theme.Bacon.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

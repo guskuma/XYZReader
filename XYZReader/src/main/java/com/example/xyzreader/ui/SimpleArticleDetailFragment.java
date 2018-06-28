@@ -2,13 +2,13 @@ package com.example.xyzreader.ui;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -41,8 +41,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
 
     public static final String ARG_ITEM_ID = "item_id";
 
-    private OnFragmentInteractionListener mListener;
-
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
@@ -66,17 +64,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
         SimpleArticleDetailFragment fragment = new SimpleArticleDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if(context instanceof OnFragmentInteractionListener){
-            mListener = (OnFragmentInteractionListener)context;
-        } else {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
@@ -180,19 +167,30 @@ public class SimpleArticleDetailFragment extends Fragment implements
                     .get(mImageUrl, new ImageLoader.ImageListener() {
                         @Override
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                            mListener.getCollapsingToolbarLayout().setTitle(mArticleTitle);
+                            CollapsingToolbarLayout collapsingToolbarLayout = ((CollapsingToolbarLayout)getActivity().findViewById(R.id.toolbar_layout));
+                            ImageView articlePhoto = ((ImageView) getActivity().findViewById(R.id.photo));
+
+                            collapsingToolbarLayout.setTitle(mArticleTitle);
                             Bitmap bitmap = imageContainer.getBitmap();
                             if (bitmap != null) {
                                 Palette p = Palette.generate(bitmap, 12);
                                 int mutedColor = p.getDarkMutedColor(0xFF333333);
-                                ((ImageView) getActivity().findViewById(R.id.photo)).setImageBitmap(imageContainer.getBitmap());
-                                getActivity().findViewById(R.id.photo).animate().alpha(1f).setDuration(300);
+                                int lightMutedColor = p.getLightMutedColor(getResources().getColor(R.color.theme_primary));
+
+
+                                articlePhoto.setImageBitmap(imageContainer.getBitmap());
+                                articlePhoto.animate().alpha(1f).setDuration(300);
+
                                 mRootView.findViewById(R.id.meta_bar).setBackgroundColor(mutedColor);
-                                mListener.getCollapsingToolbarLayout().setContentScrimColor(mutedColor);
+                                collapsingToolbarLayout.setContentScrimColor(mutedColor);
+                                collapsingToolbarLayout.setStatusBarScrimColor(mutedColor);
                                 getActivity().findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
                                 getActivity().findViewById(R.id.scrim_white).animate().alpha(0f).setDuration(300).start();
-                                getActivity().findViewById(R.id.fab).setBackgroundTintList(ColorStateList.valueOf(p.getLightMutedColor(getResources().getColor(R.color.theme_primary))));
                                 ((FloatingActionButton)getActivity().findViewById(R.id.fab)).setColorFilter(mutedColor);
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    getActivity().findViewById(R.id.fab).setBackgroundTintList(ColorStateList.valueOf(lightMutedColor));
+                                }
                             }
                         }
 
@@ -237,11 +235,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursor = null;
         bindViews();
-    }
-
-    public interface OnFragmentInteractionListener {
-        ImageView getArticlePhoto();
-        CollapsingToolbarLayout getCollapsingToolbarLayout();
     }
 
 
