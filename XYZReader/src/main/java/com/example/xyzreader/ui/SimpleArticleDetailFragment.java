@@ -166,31 +166,39 @@ public class SimpleArticleDetailFragment extends Fragment implements
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mImageUrl, new ImageLoader.ImageListener() {
                         @Override
-                        public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                            CollapsingToolbarLayout collapsingToolbarLayout = ((CollapsingToolbarLayout)getActivity().findViewById(R.id.toolbar_layout));
-                            ImageView articlePhoto = ((ImageView) getActivity().findViewById(R.id.photo));
+                        public void onResponse(final ImageLoader.ImageContainer imageContainer, boolean b) {
+                            final CollapsingToolbarLayout collapsingToolbarLayout = ((CollapsingToolbarLayout)getActivity().findViewById(R.id.toolbar_layout));
+                            final ImageView articlePhoto = ((ImageView) getActivity().findViewById(R.id.photo));
 
                             collapsingToolbarLayout.setTitle(mArticleTitle);
                             Bitmap bitmap = imageContainer.getBitmap();
                             if (bitmap != null) {
-                                Palette p = Palette.generate(bitmap, 12);
-                                int mutedColor = p.getDarkMutedColor(0xFF333333);
-                                int lightMutedColor = p.getLightMutedColor(getResources().getColor(R.color.theme_primary));
+                                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                                    @Override
+                                    public void onGenerated(Palette p) {
 
+                                        int darkMutedColor = p.getDarkMutedColor(getResources().getColor(R.color.dark_gray));
+                                        int lightMutedColor = p.getLightMutedColor(getResources().getColor(R.color.light_gray));
+                                        int darkVibrantColor = p.getDarkVibrantColor(getResources().getColor(R.color.dark_gray));
+                                        int lightVibrantColor = p.getLightVibrantColor(getResources().getColor(R.color.light_gray));
 
-                                articlePhoto.setImageBitmap(imageContainer.getBitmap());
-                                articlePhoto.animate().alpha(1f).setDuration(300);
+                                        articlePhoto.setImageBitmap(imageContainer.getBitmap());
+                                        articlePhoto.animate().alpha(1f).setDuration(300);
 
-                                mRootView.findViewById(R.id.meta_bar).setBackgroundColor(mutedColor);
-                                collapsingToolbarLayout.setContentScrimColor(mutedColor);
-                                collapsingToolbarLayout.setStatusBarScrimColor(mutedColor);
-                                getActivity().findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
-                                getActivity().findViewById(R.id.scrim_white).animate().alpha(0f).setDuration(300).start();
-                                ((FloatingActionButton)getActivity().findViewById(R.id.fab)).setColorFilter(mutedColor);
+                                        mRootView.findViewById(R.id.meta_bar).setBackgroundColor(darkMutedColor);
+                                        collapsingToolbarLayout.setContentScrimColor(darkMutedColor);
+                                        collapsingToolbarLayout.setStatusBarScrimColor(darkMutedColor);
+                                        getActivity().findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
+                                        getActivity().findViewById(R.id.scrim_white).animate().alpha(0f).setDuration(300).start();
+                                        ((FloatingActionButton)getActivity().findViewById(R.id.fab)).setColorFilter(darkVibrantColor);
+                                        mRootView.setBackgroundColor(lightMutedColor);
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    getActivity().findViewById(R.id.fab).setBackgroundTintList(ColorStateList.valueOf(lightMutedColor));
-                                }
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                            getActivity().findViewById(R.id.fab).setBackgroundTintList(ColorStateList.valueOf(lightVibrantColor));
+                                        }
+
+                                    }
+                                });
                             }
                         }
 

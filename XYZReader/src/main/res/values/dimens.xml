@@ -1,16 +1,22 @@
 <resources>
-    <!-- detail -->
-    <dimen name="detail_title_text_size">32sp</dimen>
+
+    <integer name="list_column_count">1</integer>
+
+    <dimen name="fab_vert_margin">16dp</dimen>
+    <dimen name="fab_horiz_margin">16dp</dimen>
+
+    <dimen name="list_side_margin">4dp</dimen>
+    <dimen name="list_toolbar_height">56dp</dimen>
+    <dimen name="list_margin_vertical">16dp</dimen>
+    <dimen name="list_bar_padding">8dp</dimen>
+
     <dimen name="detail_body_text_size">22sp</dimen>
     <item name="detail_body_line_spacing_multiplier" format="float" type="fraction">1.25</item>
-
-    <dimen name="fab_elevation">6dp</dimen>
-    <dimen name="fab_press_translation_z">12dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="app_bar_height">168dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
-    <dimen name="app_toolbar_height">56dp</dimen>
-    <dimen name="list_margin_vertical">16dp</dimen>
-    <dimen name="app_bar_padding">8dp</dimen>
+    <dimen name="detail_bar_height">180dp</dimen>
+    <dimen name="detail_horiz_margin">0dp</dimen>
+    <dimen name="detail_vert_margin">0dp</dimen>
+    <dimen name="detail_elevation">0dp</dimen>
+    <dimen name="detail_horiz_padding">16dp</dimen>
+    <dimen name="detail_vert_padding">16dp</dimen>
 
 </resources>

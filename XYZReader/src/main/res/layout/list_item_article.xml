@@ -1,6 +1,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginBottom="4dp"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
@@ -9,25 +10,26 @@
     android:focusable="true"
     android:foreground="?selectableItemBackground">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <FrameLayout
+        <com.example.xyzreader.ui.DynamicHeightNetworkImageView
+            android:id="@+id/thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:scaleType="centerCrop" />
 
-            <com.example.xyzreader.ui.DynamicHeightNetworkImageView
-                android:id="@+id/thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:scaleType="centerCrop" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/scrim_gradient" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/scrim_gradient" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="bottom">
 
             <TextView
                 android:id="@+id/article_title"
@@ -36,26 +38,26 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="4"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textColor="@color/light_gray"
+                android:layout_gravity="bottom"
+                tools:text="Título do Texto"/>
+
+            <TextView
+                android:id="@+id/article_subtitle"
+                style="@style/TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:paddingBottom="16dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:paddingTop="16dp"
-                android:textColor="@color/ltgray"
-                android:layout_gravity="bottom"/>
-        </FrameLayout>
+                android:textColor="@color/light_gray"
+                tools:text="Subtítulo do texto 2018" />
 
-        <TextView
-            android:id="@+id/article_subtitle"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:textColor="#6000" />
-    </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
 
 </android.support.v7.widget.CardView>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="list_column_count">3</integer>
+
+    <dimen name="fab_horiz_margin">152dp</dimen>
+
+    <dimen name="detail_bar_height">300dp</dimen>
+    <dimen name="detail_horiz_margin">120dp</dimen>
+    <dimen name="detail_vert_margin">32dp</dimen>
+    <dimen name="detail_elevation">4dp</dimen>
+    <dimen name="detail_horiz_padding">32dp</dimen>
+    <dimen name="detail_vert_padding">32dp</dimen>
+
+</resources>

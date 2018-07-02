@@ -1,11 +1,18 @@
 <resources>
-    <!-- detail -->
-    <dimen name="detail_title_text_size">42sp</dimen>
-    <dimen name="detail_body_text_size">20sp</dimen>
-    <dimen name="app_bar_height">180dp</dimen>
-    <item name="detail_body_line_spacing_multiplier" format="float" type="fraction">1.3</item>
-    <dimen name="fab_margin">24dp</dimen>
-    <dimen name="app_toolbar_height">96dp</dimen>
+
+    <integer name="list_column_count">2</integer>
+
+    <dimen name="fab_vert_margin">24dp</dimen>
+    <dimen name="fab_horiz_margin">24dp</dimen>
+
+    <dimen name="list_toolbar_height">96dp</dimen>
     <dimen name="list_margin_vertical">24dp</dimen>
-    <dimen name="app_bar_padding">16dp</dimen>
+    <dimen name="list_bar_padding">16dp</dimen>
+
+    <dimen name="detail_body_text_size">20sp</dimen>
+    <item name="detail_body_line_spacing_multiplier" format="float" type="fraction">1.3</item>
+    <dimen name="detail_bar_height">250dp</dimen>
+    <dimen name="detail_horiz_padding">32dp</dimen>
+    <dimen name="detail_vert_padding">32dp</dimen>
+
 </resources>
