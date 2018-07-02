@@ -85,7 +85,7 @@ public class SimpleArticleDetailFragment extends Fragment implements
         // the fragment's onCreate may cause the same LoaderManager to be dealt to multiple
         // fragments because their mIndex is -1 (haven't been added to the activity yet). Thus,
         // we do this in onActivityCreated.
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(1, null, this);
     }
 
     @Override
@@ -153,10 +153,6 @@ public class SimpleArticleDetailFragment extends Fragment implements
 
             mBinded = true;
 
-        } else {
-            mRootView.setVisibility(View.GONE);
-            bylineView.setText("N/A" );
-            bodyView.setText("N/A");
         }
     }
 
