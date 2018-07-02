@@ -17,6 +17,10 @@ import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 
+import static android.support.v4.view.ViewPager.SCROLL_STATE_DRAGGING;
+import static android.support.v4.view.ViewPager.SCROLL_STATE_IDLE;
+import static android.support.v4.view.ViewPager.SCROLL_STATE_SETTLING;
+
 public class SimpleArticleDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Cursor mCursor;
@@ -68,6 +72,17 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
 
             @Override
             public void onPageScrollStateChanged(int state) {
+
+                switch (state){
+                    case SCROLL_STATE_DRAGGING:
+                        findViewById(R.id.fab).animate().alpha(0f).setDuration(300).start();
+                        break;
+                    case SCROLL_STATE_SETTLING:
+                    case SCROLL_STATE_IDLE:
+                        findViewById(R.id.fab).animate().alpha(1f).setDuration(300).start();
+                        break;
+                }
+
             }
         });
 
@@ -111,7 +126,7 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
     }
 
     private class MyPagerAdapter extends android.support.v13.app.FragmentStatePagerAdapter {
-        public MyPagerAdapter(android.app.FragmentManager fm) {
+        MyPagerAdapter(android.app.FragmentManager fm) {
             super(fm);
         }
 
