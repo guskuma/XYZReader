@@ -9,6 +9,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ import static android.support.v4.view.ViewPager.SCROLL_STATE_SETTLING;
 
 public class SimpleArticleDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private final String TAG = SimpleArticleDetailActivity.class.getSimpleName();
+
     private Cursor mCursor;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ViewPager mPager;
@@ -35,17 +38,17 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_article_detail);
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(" ");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         getLoaderManager().initLoader(0, null, this);
 
-        mCollapsingToolbarLayout = (CollapsingToolbarLayout)findViewById(R.id.toolbar_layout);
+        mCollapsingToolbarLayout = findViewById(R.id.toolbar_layout);
 
         mPagerAdapter = new MyPagerAdapter(getFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = findViewById(R.id.pager);
         mPager.setAdapter(mPagerAdapter);
         mPager.setPageMargin((int) TypedValue
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
@@ -59,6 +62,9 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
             public void onPageSelected(int position) {
 
                 if(position != currentPage){
+
+                    Log.d(TAG,"Changing page: " + currentPage + " to " + position);
+
                     mCollapsingToolbarLayout.setTitle(" ");
                     findViewById(R.id.scrim_white).animate().alpha(0.2f).setDuration(300).start();
                     findViewById(R.id.top_progress_bar).setVisibility(View.VISIBLE);
@@ -75,11 +81,13 @@ public class SimpleArticleDetailActivity extends AppCompatActivity implements Lo
 
                 switch (state){
                     case SCROLL_STATE_DRAGGING:
+                        Log.d(TAG,"Dragging");
                         findViewById(R.id.fab).animate().alpha(0f).setDuration(300).start();
                         break;
                     case SCROLL_STATE_SETTLING:
                     case SCROLL_STATE_IDLE:
-                        findViewById(R.id.fab).animate().alpha(1f).setDuration(300).start();
+                        Log.d(TAG,"Settling | IDLE");
+                        findViewById(R.id.fab).animate().alpha(1f).setDuration(400).start();
                         break;
                 }
 

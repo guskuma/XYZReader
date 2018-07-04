@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
@@ -23,8 +26,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 
@@ -44,6 +51,9 @@ public class SimpleArticleDetailFragment extends Fragment implements
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
+    CollapsingToolbarLayout mCollapsingToolbarLayout;
+    ImageView mArticlePhoto;
+    FloatingActionButton mFab;
 
     private boolean mBinded = false;
     private String mArticleTitle;
@@ -86,6 +96,10 @@ public class SimpleArticleDetailFragment extends Fragment implements
         // fragments because their mIndex is -1 (haven't been added to the activity yet). Thus,
         // we do this in onActivityCreated.
         getLoaderManager().initLoader(1, null, this);
+
+         mCollapsingToolbarLayout = getActivity().findViewById(R.id.toolbar_layout);
+         mArticlePhoto =  getActivity().findViewById(R.id.photo);
+         mFab = getActivity().findViewById(R.id.fab);
     }
 
     @Override
@@ -93,6 +107,12 @@ public class SimpleArticleDetailFragment extends Fragment implements
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_simple_article_detail, container, false);
         return mRootView;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        GlideApp.with(getActivity()).clear(mArticlePhoto);
     }
 
     private Date parsePublishedDate() {
@@ -111,8 +131,8 @@ public class SimpleArticleDetailFragment extends Fragment implements
             return;
         }
 
-        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
-        TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+        TextView bylineView = mRootView.findViewById(R.id.article_byline);
+        TextView bodyView = mRootView.findViewById(R.id.article_body);
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
@@ -146,63 +166,69 @@ public class SimpleArticleDetailFragment extends Fragment implements
                 public void onClick(View view) {
                     startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
                             .setType("text/plain")
-                            .setText(mCursor.getString(ArticleLoader.Query.BODY))
+                            .setText("I'm reading: " + mCursor.getString(ArticleLoader.Query.TITLE))
                             .getIntent(), getString(R.string.action_share)));
                 }
             });
 
             mBinded = true;
 
+            Log.d(TAG, "Views binded");
         }
     }
 
     public void changeContainer() {
 
         if(mBinded) {
-            ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
-                    .get(mImageUrl, new ImageLoader.ImageListener() {
+
+            Drawable placeholder = mArticlePhoto.getDrawable() == null ? new ColorDrawable(getResources().getColor(R.color.light_gray)) : mArticlePhoto.getDrawable();
+
+            GlideApp
+                    .with(getActivity())
+                    .load(mImageUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .transition(DrawableTransitionOptions.withCrossFade(300))
+                    .placeholder(placeholder)
+                    .listener(new RequestListener<Drawable>() {
                         @Override
-                        public void onResponse(final ImageLoader.ImageContainer imageContainer, boolean b) {
-                            final CollapsingToolbarLayout collapsingToolbarLayout = ((CollapsingToolbarLayout)getActivity().findViewById(R.id.toolbar_layout));
-                            final ImageView articlePhoto = ((ImageView) getActivity().findViewById(R.id.photo));
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            return false;
+                        }
 
-                            collapsingToolbarLayout.setTitle(mArticleTitle);
-                            Bitmap bitmap = imageContainer.getBitmap();
-                            if (bitmap != null) {
-                                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                                    @Override
-                                    public void onGenerated(Palette p) {
+                        @Override
+                        public boolean onResourceReady(final Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            mCollapsingToolbarLayout.setTitle(mArticleTitle);
+                            getActivity().findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
+                            getActivity().findViewById(R.id.scrim_white).animate().alpha(0f).setDuration(300).start();
 
-                                        int darkMutedColor = p.getDarkMutedColor(getResources().getColor(R.color.dark_gray));
-                                        int lightMutedColor = p.getLightMutedColor(getResources().getColor(R.color.light_gray));
-                                        int darkVibrantColor = p.getDarkVibrantColor(getResources().getColor(R.color.dark_gray));
-                                        int lightVibrantColor = p.getLightVibrantColor(getResources().getColor(R.color.light_gray));
 
-                                        articlePhoto.setImageBitmap(imageContainer.getBitmap());
-                                        articlePhoto.animate().alpha(1f).setDuration(300);
+                            Palette.from(((BitmapDrawable)resource).getBitmap()).generate(new Palette.PaletteAsyncListener() {
+                                @Override
+                                public void onGenerated(Palette p) {
 
-                                        mRootView.findViewById(R.id.meta_bar).setBackgroundColor(darkMutedColor);
-                                        collapsingToolbarLayout.setContentScrimColor(darkMutedColor);
-                                        collapsingToolbarLayout.setStatusBarScrimColor(darkMutedColor);
-                                        getActivity().findViewById(R.id.top_progress_bar).setVisibility(View.GONE);
-                                        getActivity().findViewById(R.id.scrim_white).animate().alpha(0f).setDuration(300).start();
-                                        ((FloatingActionButton)getActivity().findViewById(R.id.fab)).setColorFilter(darkVibrantColor);
-                                        mRootView.setBackgroundColor(lightMutedColor);
+                                    int darkMutedColor = p.getDarkMutedColor(getResources().getColor(R.color.dark_gray));
+                                    int lightMutedColor = p.getLightMutedColor(getResources().getColor(R.color.light_gray));
+                                    int darkVibrantColor = p.getDarkVibrantColor(getResources().getColor(R.color.dark_gray));
+                                    int lightVibrantColor = p.getLightVibrantColor(getResources().getColor(R.color.light_gray));
 
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                            getActivity().findViewById(R.id.fab).setBackgroundTintList(ColorStateList.valueOf(lightVibrantColor));
-                                        }
+                                    mRootView.findViewById(R.id.meta_bar).setBackgroundColor(darkMutedColor);
+                                    mCollapsingToolbarLayout.setContentScrimColor(darkMutedColor);
+                                    mCollapsingToolbarLayout.setStatusBarScrimColor(darkMutedColor);
+                                    mFab.setColorFilter(darkVibrantColor);
+                                    mRootView.setBackgroundColor(lightMutedColor);
 
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        getActivity().findViewById(R.id.fab).setBackgroundTintList(ColorStateList.valueOf(lightVibrantColor));
                                     }
-                                });
-                            }
-                        }
 
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-
+                                }
+                            });
+                            return false;
                         }
-                    });
+                    })
+                    .into(mArticlePhoto);
+
+            Log.d(TAG, "Container changed");
         }
     }
 
@@ -233,6 +259,8 @@ public class SimpleArticleDetailFragment extends Fragment implements
         getActivity().findViewById(R.id.pager).animate().alpha(1f).setDuration(300);
         getActivity().findViewById(R.id.fab).animate().alpha(1f).setDuration(300);
         getActivity().findViewById(R.id.progress_bar).setVisibility(View.GONE);
+
+        Log.d(TAG, "Cursor load finished");
     }
 
     @Override
